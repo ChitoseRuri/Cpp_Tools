@@ -1,0 +1,7 @@
+﻿  Mutiplay Elevator Simulation.cpp
+d:\mydocument\document\vssaves\cloud\chitoseruri\personal project\mutiplay elevator simulation\mutiplay elevator simulation\mutiplay elevator simulation.cpp(26): error C2039: “cout”: 不是“std”的成员
+  d:\mydocument\document\vssaves\cloud\chitoseruri\personal project\mutiplay elevator simulation\mutiplay elevator simulation\predefined c++ types (compiler internal)(238): note: 参见“std”的声明
+d:\mydocument\document\vssaves\cloud\chitoseruri\personal project\mutiplay elevator simulation\mutiplay elevator simulation\mutiplay elevator simulation.cpp(26): error C2065: “cout”: 未声明的标识符
+d:\mydocument\document\vssaves\cloud\chitoseruri\personal project\mutiplay elevator simulation\mutiplay elevator simulation\mutiplay elevator simulation.cpp(26): error C2039: “endl”: 不是“std”的成员
+  d:\mydocument\document\vssaves\cloud\chitoseruri\personal project\mutiplay elevator simulation\mutiplay elevator simulation\predefined c++ types (compiler internal)(238): note: 参见“std”的声明
+d:\mydocument\document\vssaves\cloud\chitoseruri\personal project\mutiplay elevator simulation\mutiplay elevator simulation\mutiplay elevator simulation.cpp(26): error C2065: “endl”: 未声明的标识符

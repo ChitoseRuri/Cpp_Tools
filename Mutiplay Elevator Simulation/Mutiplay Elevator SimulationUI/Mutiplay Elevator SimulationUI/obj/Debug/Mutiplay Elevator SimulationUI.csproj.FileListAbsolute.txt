@@ -1,0 +1,9 @@
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\bin\Debug\Mutiplay Elevator SimulationUI.exe.config
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\bin\Debug\Mutiplay Elevator SimulationUI.exe
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\bin\Debug\Mutiplay Elevator SimulationUI.pdb
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\obj\Debug\Mutiplay_Elevator_SimulationUI.Form1.resources
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\obj\Debug\Mutiplay_Elevator_SimulationUI.Properties.Resources.resources
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\obj\Debug\Mutiplay Elevator SimulationUI.csproj.GenerateResource.Cache
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\obj\Debug\Mutiplay Elevator SimulationUI.csproj.CoreCompileInputs.cache
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\obj\Debug\Mutiplay Elevator SimulationUI.exe
+D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\Personal Project\Mutiplay Elevator SimulationUI\Mutiplay Elevator SimulationUI\obj\Debug\Mutiplay Elevator SimulationUI.pdb
