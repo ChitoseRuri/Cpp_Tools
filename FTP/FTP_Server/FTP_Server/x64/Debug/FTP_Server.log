@@ -1,0 +1,10 @@
+﻿  main.cpp
+  server.cpp
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_server\ftp_server\server.cpp(259): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_server\ftp_server\server.cpp(272): warning C4267: “=”: 从“size_t”转换到“UINT32”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_server\ftp_server\server.cpp(343): warning C4244: “初始化”: 从“INT64”转换到“INT32”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_server\ftp_server\server.cpp(421): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  ui.cpp
+  正在生成代码...
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_server\ftp_server\server.cpp(154): warning C4715: “CR::Server_ForeClient::BufferProcess”: 不是所有的控件路径都返回值
+  FTP_Server.vcxproj -> D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\FTP\FTP_Server\x64\Debug\FTP_Server.exe

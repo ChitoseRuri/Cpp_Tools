@@ -1,0 +1,38 @@
+﻿  client.cpp
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\client.cpp(153): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\client.cpp(174): warning C4267: “初始化”: 从“size_t”转换到“INT32”，可能丢失数据
+  main.cpp
+  test.cpp
+  ui.cpp
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(123): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(146): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(195): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(196): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(197): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(259): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(260): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(261): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(267): warning C4267: “=”: 从“size_t”转换到“SHORT”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(292): warning C4101: “key”: 未引用的局部变量
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(330): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(331): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(332): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(333): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(340): warning C4267: “=”: 从“size_t”转换到“SHORT”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(347): warning C4102: “ImportBegin”: 未引用的标签
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(495): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(582): warning C4477: “printf”: 格式字符串“%u”需要类型“unsigned int”的参数，但可变参数 1 拥有了类型“UINT64”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(582): note: 请考虑在格式字符串中使用“%llu”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(582): note: 请考虑在格式字符串中使用“%Iu”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(582): note: 请考虑在格式字符串中使用“%I64u”
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(657): warning C4477: “printf”: 格式字符串“%10u”需要类型“unsigned int”的参数，但可变参数 1 拥有了类型“UINT64”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(657): note: 请考虑在格式字符串中使用“%llu”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(657): note: 请考虑在格式字符串中使用“%Iu”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(657): note: 请考虑在格式字符串中使用“%I64u”
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(677): warning C4477: “printf”: 格式字符串“%10u”需要类型“unsigned int”的参数，但可变参数 1 拥有了类型“UINT64”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(677): note: 请考虑在格式字符串中使用“%llu”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(677): note: 请考虑在格式字符串中使用“%Iu”
+  d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(677): note: 请考虑在格式字符串中使用“%I64u”
+d:\mydocument\document\vssaves\cloud\chitoseruri\ftp\ftp_client\ftp_client\ui.cpp(816): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  正在生成代码...
+  FTP_Client.vcxproj -> D:\MyDocument\Document\VSSaves\Cloud\ChitoseRuri\FTP\FTP_Client\x64\Debug\FTP_Client.exe
