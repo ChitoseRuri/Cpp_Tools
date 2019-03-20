@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "R_BTree", "R_BTree\R_BTree.vcxproj", "{C6235B9B-97B7-490B-B52B-4D2133595204}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RB_Tree", "RB_Tree\RB_Tree.vcxproj", "{C6235B9B-97B7-490B-B52B-4D2133595204}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
