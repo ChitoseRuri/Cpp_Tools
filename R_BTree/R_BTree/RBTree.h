@@ -5,15 +5,16 @@
 #endif // defined(_Debug)|defined(Debug)
 #include <assert.h>
 
+enum  class RB_Tree_Color
+{
+	red = 0,
+	black
+};
+
 template<typename T>
 struct RBNode
 {
-	enum Color
-	{
-		red = 1,
-		black
-	};
-	Color color;
+	RB_Tree_Color color;
 	RBNode<T> *left, *right, *parent;
 	T data;
 };
