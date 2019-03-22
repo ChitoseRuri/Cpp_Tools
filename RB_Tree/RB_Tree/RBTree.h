@@ -12,158 +12,63 @@ enum class RB_Tree_Color
 };
 
 template<typename T>
-class RBTree
+struct Compare
+{
+	bool operator()(T && lhs, T && rhs)
+	{
+		return lhs < rhs;
+	}
+};
+
+template<typename T>
+class Allocator
 {
 private:
-	struct Node
-	{
-		RB_Tree_Color color;
-		Node *left, *right, *parent;
-		T data;
-	};
+
+public:
+	T& operator ()
+};
+
+template<typename _Key, typename _Value>
+struct RB_Tree_Node
+{
+	RB_Tree_Color color;
+	_Key key;
+	_Value value;
+	RB_Tree_Node *parent, *left, *right;
+};
+
+template<typename _Key,
+	typename _Value,
+	typename _Compare = Compare<_Key>,
+	typename _Allocate = Allocator<RB_Tree_Node<_Key, _Value>>>
+	class RBTree
+{
+private:
+	using Node = RB_Tree_Node;
 
 public:
 	class iterator
 	{
-	private:
 	public:
 		iterator();
 		~iterator();
 
-		void operator ++();
-		void operator --();
-		void operator *()const;
-		void operator ->()const;
+		
 	};
 
 private:
-	Node * m_pRoot;				//root ptr
-	Node * m_pRub;				//rubbish ptr
+	Node * m_pRoot;
 
 private:
-	void rotateLeft(RBTree<T>::Node * pNode);			//counterclockwise
-	void rotateRight(RBTree<T>::Node * pNode);			//clockwise
-	void check();
-	void fix();
-	void clear(RBTree<T>::Node * p);
-	bool isLeaf(const RBTree<T>::Node* pNode) const;
+	void rotateLeft() noexcept;
+	void rotateRight() noexcept;
 
 public:
 	RBTree();
-	RBTree(RBTree<T> & lhs);
-	RBTree(RBTree<T> && rhs);
-	~RBTree();
-	bool insert(T && data);
-	bool copy(RBTree<T> & lhs);
-	const RBTree<T>::Node * find(T && data);
-	void clear();
+	RBTree(const RBTree & lhs);
+	RBTree(RBTree && rhs);
+
+	clone(const RBTree & lhs) noexcept;
+	clear() noexcept;
 };
-
-template<typename T>
-inline void RBTree<T>::rotateLeft(RBTree<T>::Node * pNode)
-{
-	assert(pNode);//pNode must not be nullptr
-	assert(!isLeaf(pNode));//pNode must not be left node
-	auto pParent = pNode->parent;
-	auto pRightChild = pNode->right;
-	if (pParent)//if parent exists
-	{
-		//set the right child as pNode's parent's child
-		(pParent->left == pNode) ? (pParent->left = pRightChild) : (pParent->right = pRightChild);
-	}
-	pRightChild->parent = pParent;
-	//set the right child's left child as pNode's right child
-	pNode->right = pRightChild->left;
-	pRightChild->left->parent = pNode;
-	//set pNode as right child's left child
-	pRightChild->left = pNode;
-	pNode->parent = pRightChild;
-}
-
-template<typename T>
-inline void RBTree<T>::rotateRight(RBTree<T>::Node * pNode)
-{
-	assert(pNode);//pNode must not be nullptr
-	assert(!isLeaf(pNode));//pNode must not be left node
-	auto pParent = pNode->parent;
-	auto pLeftChild = pNode->left;
-	if (pParent)//if parent exists
-	{
-		//set the left child as pNode's parent' child
-		(pParent->left == pNode) ? (pParent->left = pLeftChild) : (pParent->right = pLeftChild);
-	}
-	pLeftChild->parent = pParent;
-	//set the left child's right child as pNode's left child
-	pNode->left = pLeftChild->right;
-	pLeftChild->right->parent = pNode;
-	//set pNode as left child's right child
-	pLeftChild->right = pNode;
-	pNode->parent = pLeftChild;
-}
-
-template<typename T>
-inline void RBTree<T>::clear(RBTree<T>::Node* p)
-{
-	if (p)
-	{
-		clear(p->left);
-		clear(p->right);
-		delete p;
-	}
-}
-
-template<typename T>
-inline bool RBTree<T>::isLeaf(const RBTree<T>::Node* pNode) const
-{
-	assert(pNode);
-	return !(pNode->left || pNode->right);
-}
-
-template<typename T>
-inline RBTree<T>::RBTree() :
-	m_pRoot(new RBTree<T>::Node({ RB_Tree_Color::black,nullptr,nullptr, nullptr })),
-	m_pRub(nullptr)
-{
-}
-
-template<typename T>
-inline RBTree<T>::RBTree(RBTree<T>& lhs)
-{
-	copy(lhs);
-}
-
-template<typename T>
-inline RBTree<T>::RBTree(RBTree<T>&& rhs):
-	m_pRoot(rhs.m_pRoot)
-{
-	rhs.m_pRoot = nullptr;
-	
-}
-
-
-template<typename T>
-inline RBTree<T>::~RBTree()
-{
-	clear(m_pRoot);
-}
-
-template<typename T>
-inline bool RBTree<T>::insert(T && data)
-{
-	auto p = m_pRoot;
-	while (!isLeaf(p))
-	{
-	}
-}
-
-template<typename T>
-inline void RBTree<T>::clear()
-{
-	clear(m_pRoot);
-	while (m_pRub)
-	{
-		auto p = m_pRub;
-		m_pRub = m_pRub->right;
-		delete p;
-	}
-}
