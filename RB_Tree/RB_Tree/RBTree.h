@@ -24,31 +24,27 @@ class RBTree
 {
 private:
 	RBNode<T> * m_Root;
+	struct k
+	{
+
+	};
 
 private:
-	void rotateLeft(RBNode<T> *&& pNode);
-	void rotateRight(RBNode<T> *&& pNode);
+	void rotateLeft(RBNode<T> * pNode);
+	void rotateRight(RBNode<T> * pNode);
 	void check();
 	void clear(RBNode<T> * p);
 
 public:
 	RBTree();
+	RBTree(const RBTree<T> & lhs);
+	RBTree(RBTree<T> && rhs);
 	~RBTree();
 	bool insert(T && data);
-	const RBNode<T> * find(T && data);
 	void clear();
-	bool isLeaf(const RBNode<T>* && pNode) const;
+	bool isLeaf(const RBNode<T>* pNode) const;
+
 };
-
-template<typename T>
-inline void RBTree<T>::rotateLeft(RBNode<T>*&& pNode)
-{
-}
-
-template<typename T>
-inline void RBTree<T>::rotateRight(RBNode<T>*&& pNode)
-{
-}
 
 template<typename T>
 inline void RBTree<T>::clear(RBNode<T>* p)
@@ -68,6 +64,19 @@ inline RBTree<T>::RBTree() :
 }
 
 template<typename T>
+inline RBTree<T>::RBTree(const RBTree<T> & lhs)
+{
+
+}
+
+template<typename T>
+inline RBTree<T>::RBTree(RBTree<T> && rhs):
+	m_Root(rhs.m_Root)
+{
+	rhs.m_Root = nullptr;
+}
+
+template<typename T>
 inline RBTree<T>::~RBTree()
 {
 }
@@ -79,35 +88,13 @@ inline bool RBTree<T>::insert(T && data)
 }
 
 template<typename T>
-inline const RBNode<T> * RBTree<T>::find(T && data)
-{
-	RBNode<T> * p = m_Root;
-	while (!isLeaf(p))
-	{
-		if (p->data == data)
-		{
-			return p;
-		}
-		else if (p->data > data)
-		{
-			p = p->right;
-		}
-		else
-		{
-			p = p->left;
-		}
-	}
-	return nullptr;
-}
-
-template<typename T>
 inline void RBTree<T>::clear()
 {
 	clear(m_Root);
 }
 
 template<typename T>
-inline bool RBTree<T>::isLeaf(const RBNode<T>*&& pNode) const
+inline bool RBTree<T>::isLeaf(const RBNode<T>* pNode) const
 {
 	assert(pNode);
 	return !(pNode->left || pNode->right);
