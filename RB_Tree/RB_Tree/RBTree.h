@@ -4,257 +4,114 @@
 #define NDEBUG
 #endif // defined(_Debug)|defined(Debug)
 #include <assert.h>
+#include <vector>
+#include <stdarg.h>
 
-enum  class RB_Tree_Color
+enum class RB_Tree_Color
 {
 	red = 0,
 	black
 };
 
 template<typename T>
-<<<<<<< HEAD
-struct RBNode
+struct Small
 {
-	RB_Tree_Color color;
-	RBNode<T> *left, *right, *parent;
-	T data;
+	bool operator()(T && lhs, T && rhs)
+	{
+		return lhs < rhs;
+	}
 };
 
 template<typename T>
-class RBTree
+class LazyDelete
 {
 private:
-	RBNode<T> * m_Root;
-	struct k
-	{
+	std::vector<T*> m_Data;
+	std::vector<bool> m_Use;
 
-	};
-
-private:
-	void rotateLeft(RBNode<T> * pNode);
-	void rotateRight(RBNode<T> * pNode);
-	void check();
-	void clear(RBNode<T> * p);
 
 public:
-	RBTree();
-	RBTree(const RBTree<T> & lhs);
-	RBTree(RBTree<T> && rhs);
-	~RBTree();
-	bool insert(T && data);
-	void clear();
-	bool isLeaf(const RBNode<T>* pNode) const;
-
+	LazyDelete();
+	~LazyDelete();
+	T * allocate(...);
+	void deallocate(T *);
 };
 
-template<typename T>
-inline void RBTree<T>::clear(RBNode<T>* p)
+template<typename _Key, typename _Value>
+struct RB_Tree_Node
 {
-	if (p)
-	{
-		clear(p->left);
-		clear(p->right);
-		delete p;
-	}
-}
+	RB_Tree_Color color;
+	_Key key;
+	_Value value;
+	RB_Tree_Node *parent, *left, *right;
+};
 
-template<typename T>
-inline RBTree<T>::RBTree() :
-	m_Root(new RBNode<T>({ RBNode<T>::Color::black,nullptr,nullptr, nullptr }))
-{
-}
-
-template<typename T>
-inline RBTree<T>::RBTree(const RBTree<T> & lhs)
-{
-
-}
-
-template<typename T>
-inline RBTree<T>::RBTree(RBTree<T> && rhs):
-	m_Root(rhs.m_Root)
-{
-	rhs.m_Root = nullptr;
-}
-
-template<typename T>
-inline RBTree<T>::~RBTree()
-{
-}
-
-template<typename T>
-inline bool RBTree<T>::insert(T && data)
-{
-	return false;
-}
-
-template<typename T>
-inline void RBTree<T>::clear()
-{
-	clear(m_Root);
-}
-
-template<typename T>
-inline bool RBTree<T>::isLeaf(const RBNode<T>* pNode) const
-{
-	assert(pNode);
-	return !(pNode->left || pNode->right);
-}
-
-=======
-class RBTree
+template<typename _Key,
+	typename _Value,
+	typename _Compare = Small<_Key>,
+	typename _Allocate = LazyDelete<RB_Tree_Node<_Key, _Value>>>
+	class RBTree
 {
 private:
-	struct Node
-	{
-		RB_Tree_Color color;
-		Node *left, *right, *parent;
-		T data;
-	};
+	using Node = RB_Tree_Node;
 
 public:
 	class iterator
 	{
-	private:
 	public:
 		iterator();
 		~iterator();
 
-		void operator ++();
-		void operator --();
-		void operator *()const;
-		void operator ->()const;
+
 	};
 
 private:
-	Node * m_pRoot;				//root ptr
-	Node * m_pRub;				//rubbish ptr
+	Node * m_pRoot;
 
 private:
-	void rotateLeft(RBTree<T>::Node * pNode);			//counterclockwise
-	void rotateRight(RBTree<T>::Node * pNode);			//clockwise
-	void check();
-	void fix();
-	void clear(RBTree<T>::Node * p);
-	bool isLeaf(const RBTree<T>::Node* pNode) const;
+	void rotateLeft() noexcept;
+	void rotateRight() noexcept;
+	
 
 public:
 	RBTree();
-	RBTree(RBTree<T> & lhs);
-	RBTree(RBTree<T> && rhs);
-	~RBTree();
-	bool insert(T && data);
-	bool copy(RBTree<T> & lhs);
-	const RBTree<T>::Node * find(T && data);
-	void clear();
+	RBTree(const RBTree & lhs);
+	RBTree(RBTree && rhs);
+
+	clone(const RBTree & lhs) noexcept;
+	clear() noexcept;
 };
 
 template<typename T>
-inline void RBTree<T>::rotateLeft(RBTree<T>::Node * pNode)
+inline LazyDelete<T>::LazyDelete()
 {
-	assert(pNode);//pNode must not be nullptr
-	assert(!isLeaf(pNode));//pNode must not be left node
-	auto pParent = pNode->parent;
-	auto pRightChild = pNode->right;
-	if (pParent)//if parent exists
+}
+
+template<typename T>
+inline LazyDelete<T>::~LazyDelete()
+{
+}
+
+template<typename T>
+inline T * LazyDelete<T>::allocate(...)
+{
+	if (!m_Use.empty())
 	{
-		//set the right child as pNode's parent's child
-		(pParent->left == pNode) ? (pParent->left = pRightChild) : (pParent->right = pRightChild);
+		size_t index = 0 ,size = m_Use.size();
+		for (; index < size; index++)
+		{
+			if (!m_Use[index])
+			{
+				m_Use[index] = true;
+				return new(m_Data.begin() + index) T(va_list);
+			}
+		}
 	}
-	pRightChild->parent = pParent;
-	//set the right child's left child as pNode's right child
-	pNode->right = pRightChild->left;
-	pRightChild->left->parent = pNode;
-	//set pNode as right child's left child
-	pRightChild->left = pNode;
-	pNode->parent = pRightChild;
+	return new T;
 }
 
 template<typename T>
-inline void RBTree<T>::rotateRight(RBTree<T>::Node * pNode)
+inline void LazyDelete<T>::deallocate(T *)
 {
-	assert(pNode);//pNode must not be nullptr
-	assert(!isLeaf(pNode));//pNode must not be left node
-	auto pParent = pNode->parent;
-	auto pLeftChild = pNode->left;
-	if (pParent)//if parent exists
-	{
-		//set the left child as pNode's parent' child
-		(pParent->left == pNode) ? (pParent->left = pLeftChild) : (pParent->right = pLeftChild);
-	}
-	pLeftChild->parent = pParent;
-	//set the left child's right child as pNode's left child
-	pNode->left = pLeftChild->right;
-	pLeftChild->right->parent = pNode;
-	//set pNode as left child's right child
-	pLeftChild->right = pNode;
-	pNode->parent = pLeftChild;
-}
 
-template<typename T>
-inline void RBTree<T>::clear(RBTree<T>::Node* p)
-{
-	if (p)
-	{
-		clear(p->left);
-		clear(p->right);
-		delete p;
-	}
 }
-
-template<typename T>
-inline bool RBTree<T>::isLeaf(const RBTree<T>::Node* pNode) const
-{
-	assert(pNode);
-	return !(pNode->left || pNode->right);
-}
-
-template<typename T>
-inline RBTree<T>::RBTree() :
-	m_pRoot(new RBTree<T>::Node({ RB_Tree_Color::black,nullptr,nullptr, nullptr })),
-	m_pRub(nullptr)
-{
-}
-
-template<typename T>
-inline RBTree<T>::RBTree(RBTree<T>& lhs)
-{
-	copy(lhs);
-}
-
-template<typename T>
-inline RBTree<T>::RBTree(RBTree<T>&& rhs):
-	m_pRoot(rhs.m_pRoot)
-{
-	rhs.m_pRoot = nullptr;
-	
-}
-
-
-template<typename T>
-inline RBTree<T>::~RBTree()
-{
-	clear(m_pRoot);
-}
-
-template<typename T>
-inline bool RBTree<T>::insert(T && data)
-{
-	auto p = m_pRoot;
-	while (!isLeaf(p))
-	{
-	}
-}
-
-template<typename T>
-inline void RBTree<T>::clear()
-{
-	clear(m_pRoot);
-	while (m_pRub)
-	{
-		auto p = m_pRub;
-		m_pRub = m_pRub->right;
-		delete p;
-	}
-}
->>>>>>> parent of 44b6463... Remaster
