@@ -3,6 +3,6 @@
 
 int main()
 {
-	std::map<int, int> map;
+	RBTree<int, int>::iterator rbitr;
 	return 0;
 }
