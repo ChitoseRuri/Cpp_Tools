@@ -5,7 +5,6 @@
 #endif // defined(_Debug)|defined(Debug)
 #include <assert.h>
 #include <vector>
-#include <stdarg.h>
 
 enum class RB_Tree_Color
 {
@@ -27,14 +26,18 @@ class LazyDelete
 {
 private:
 	std::vector<T*> m_Data;
-	std::vector<bool> m_Use;
+	std::vector<T*> m_Rub;
 
 
 public:
 	LazyDelete();
+	LazyDelete(LazyDelete && rhs);
 	~LazyDelete();
-	T * allocate();
+
+	T * allocate() noexcept;
 	void deallocate(T *& p);
+	void clear() noexcept;
+	void dispose() noexcept;
 };
 
 template<typename _Key, typename _Value>
@@ -94,6 +97,7 @@ private:
 	void rotateLeft() noexcept;
 	void rotateRight() noexcept;
 	void clone(Node<_Key, _Value> *const pDestination, Node<_Key, _Value> *const pSource) noexcept;
+	void fix();
 
 public:
 	RBTree();
@@ -102,6 +106,7 @@ public:
 
 	void clone(const RBTree & lhs) noexcept;
 	void clear() noexcept;
+	void dispose() noexcept;
 	bool isLeaf(const Node<_Key, _Value> *const p)const noexcept;
 };
 
@@ -111,43 +116,73 @@ inline LazyDelete<T>::LazyDelete()
 }
 
 template<typename T>
-inline LazyDelete<T>::~LazyDelete()
+inline LazyDelete<T>::LazyDelete(LazyDelete && rhs) :
+	m_Data(std::move(rhs.m_Data)),
+	m_Rub(std::move(rhs.m_Rub))
 {
-	for (auto & var : m_Data)
-	{
-		delete var;
-	}
 }
 
 template<typename T>
-inline T * LazyDelete<T>::allocate()
+inline LazyDelete<T>::~LazyDelete()
 {
+	dispose();
+}
 
-	size_t index = 0, size = m_Use.size();
-	for (; index < size; index++)
+template<typename T>
+inline T * LazyDelete<T>::allocate() noexcept
+{
+	if (!m_Rub.empty())
 	{
-		if (!m_Use[index])
-		{
-			m_Use[index] = true;
-			return new(&m_Data[index]) T();
-		}
+		m_Data.push_back(m_Rub.back());
+		m_Rub.pop_back();
+		return new(&m_Data.back()) T();
 	}
-	m_Data.emplace_back(new T());
-	return m_Data.back() - 1;
+	else
+	{
+		m_Data.emplace_back(new T());
+		return m_Data.back();
+	}
 }
 
 template<typename T>
 inline void LazyDelete<T>::deallocate(T *& p)
 {
-	for (size_t size = m_Data.size(), i = 0; i != size; i++)
+	for (size_t i = 0, size = m_Data.size(); i != size; i++)
 	{
 		if (m_Data[i] == p)
 		{
-			m_Use[i] = false;
+			m_Data[i] = m_Data.back();
+			m_Data.pop_back();
+			m_Rub.push_back(p);
 			p = nullptr;
 		}
 	}
-	assert(false);//p must been found in m_Data so it never goes to this
+	assert(false);//Each p should be found in m_Data, never will the program go to this line.
+}
+
+template<typename T>
+inline void LazyDelete<T>::clear() noexcept
+{
+	auto sizeD = m_Data.size();
+	auto sizeR = m_Rub.size();
+	m_Rub.resize(sizeD + sizeR, nullptr);
+	memmove_s(m_Rub.data + sizeR, sizeD * sizeof(T*), m_Data.data(), sizeD * sizeof(T*));
+	m_Data.clear();
+}
+
+template<typename T>
+inline void LazyDelete<T>::dispose() noexcept
+{
+	for (auto & var : m_Data)
+	{
+		delete var;
+	}
+	for (auto & var : m_Rub)
+	{
+		delete var;
+	}
+	m_Data.clear();
+	m_Rub.clear();
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
@@ -224,8 +259,8 @@ inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator>(const
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline void RBTree<_Key, _Value, _Compare, _Allocate>::clone(Node<_Key, _Value>* const pDestination, Node<_Key, _Value>* const pSource) noexcept
 {
-	assert(pDestination && pSource);//both ptr will not be nullptr
-	if (isLeaf(pSource))
+	assert(pDestination && pSource);//both ptrs will not be nullptr
+	if (isLeaf(pSource))			//return when pSource is leaf node
 	{
 		return;
 	}
@@ -235,19 +270,53 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::clone(Node<_Key, _Value>*
 	pDestination->left->parent = pDestination;
 	pDestination->right = m_Allocator.allocate();
 	pDestination->right->parent = pDestination;
+	clone(pDestination->left, pSource->left);
+	return clone(pDestination->right, pSource->right);//tail return
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree():
 	m_pRoot(m_Allocator.allocate())
-{
-	
+{	
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
-inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(const RBTree & lhs)
+inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(const RBTree & lhs):
+	m_pRoot(m_Allocator.allocate())//initial root before clone
 {
-	
+	clone(lhs);
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(RBTree && rhs) :
+	m_pRoot(rhs.m_pRoot),
+	m_Allocator(std::move(rhs.m_Allocator))
+{
+	rhs.m_pRoot = nullptr;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::clone(const RBTree & lhs) noexcept
+{
+	if (!isLeaf(m_pRoot))
+	{
+		clear();
+	}
+	clone(m_pRoot, lhs.m_pRoot);
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::clear() noexcept
+{
+	m_pRoot = nullptr;
+	m_Allocator.clear();
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::dispose() noexcept
+{
+	m_pRoot = nullptr;
+	m_Allocator.dispose();
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
