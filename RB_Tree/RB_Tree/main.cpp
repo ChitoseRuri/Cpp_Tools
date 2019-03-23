@@ -3,6 +3,7 @@
 
 int main()
 {
-	RBTree<int, int>::iterator rbitr;
+	RBTree<int, int>::iterator rbi;
+	RBTree<int, int> rbt;
 	return 0;
 }

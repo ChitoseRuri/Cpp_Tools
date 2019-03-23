@@ -47,7 +47,7 @@ struct Pair
 template<typename _Key, typename _Value>
 struct RB_Tree_Node
 {
-	RB_Tree_Color color;
+	RB_Tree_Color color = RB_Tree_Color::black;
 	Pair<_Key, _Value> data;
 	RB_Tree_Node *parent, *left, *right;
 };
@@ -76,15 +76,24 @@ public:
 		void operator--();
 		auto operator->();
 		auto & operator*();
+		bool operator == (const iterator & lhs) const noexcept;
+		bool operator == (const iterator && rhs) const noexcept;
+		bool operator != (const iterator & lhs) const noexcept;
+		bool operator != (const iterator && rhs) const noexcept;
+		bool operator < (const iterator & lhs) const noexcept;
+		bool operator < (const iterator && rhs) const noexcept;
+		bool operator > (const iterator & lhs) const noexcept;
+		bool operator > (const iterator && rhs) const noexcept;
 	};
 
 private:
+	_Allocate m_Allocator;
 	Node<_Key, _Value> * m_pRoot;
 
 private:
 	void rotateLeft() noexcept;
 	void rotateRight() noexcept;
-	
+	void clone(Node<_Key, _Value> *const pDestination, Node<_Key, _Value> *const pSource) noexcept;
 
 public:
 	RBTree();
@@ -93,6 +102,7 @@ public:
 
 	void clone(const RBTree & lhs) noexcept;
 	void clear() noexcept;
+	bool isLeaf(const Node<_Key, _Value> *const p)const noexcept;
 };
 
 template<typename T>
@@ -137,7 +147,7 @@ inline void LazyDelete<T>::deallocate(T *& p)
 			p = nullptr;
 		}
 	}
-	assert(false);//never goes to this
+	assert(false);//p must been found in m_Data so it never goes to this
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
@@ -161,4 +171,87 @@ template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline auto & RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator*()
 {
 	return m_p->data;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator==(const iterator & lhs) const noexcept
+{
+	return m_p == lhs.m_p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator==(const iterator && rhs) const noexcept
+{
+	return m_p == rhs.m_p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator!=(const iterator & lhs) const noexcept
+{
+	return m_p != lhs.m_p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator!=(const iterator && rhs) const noexcept
+{
+	return m_p != rhs.m_p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator<(const iterator & lhs) const noexcept
+{
+	return m_p < lhs.m_p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator<(const iterator && rhs) const noexcept
+{
+	return m_p < rhs.m_p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator>(const iterator & lhs) const noexcept
+{
+	return m_p > lhs.m_p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator>(const iterator && rhs) const noexcept
+{
+	return m_p > rhs.m_p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::clone(Node<_Key, _Value>* const pDestination, Node<_Key, _Value>* const pSource) noexcept
+{
+	assert(pDestination && pSource);//both ptr will not be nullptr
+	if (isLeaf(pSource))
+	{
+		return;
+	}
+	pDestination->data = pSource->data;
+	pDestination->color = pSource->color;
+	pDestination->left = m_Allocator.allocate();
+	pDestination->left->parent = pDestination;
+	pDestination->right = m_Allocator.allocate();
+	pDestination->right->parent = pDestination;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree():
+	m_pRoot(m_Allocator.allocate())
+{
+	
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(const RBTree & lhs)
+{
+	
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::isLeaf(const Node<_Key, _Value>* const p) const noexcept
+{
+	return !(p->left || p->right);
 }
