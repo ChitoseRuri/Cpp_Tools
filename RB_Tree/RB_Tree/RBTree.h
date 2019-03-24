@@ -94,6 +94,7 @@ public:
 
 private:
 	_Allocate m_Allocator;
+	_Compare m_Comparator;
 	Node<_Key, _Value> * m_pRoot;
 
 private:
@@ -110,7 +111,8 @@ public:
 	void clone(const RBTree & lhs) noexcept;
 	void clear() noexcept;
 	void dispose() noexcept;
-	RBTree<_Key, _Value, _Compare, _Allocate>::iterator find(const _Key && key) noexcept;
+	auto find(const _Key & key) noexcept;
+	auto find(const _Key && key) noexcept;
 	bool isLeaf(const Node<_Key, _Value> *const p)const noexcept;
 	bool insert(Pair<_Key, _Value> & lhs) noexcept;
 	bool insert(Pair<_Key, _Value>&& rhs) noexcept;
@@ -377,17 +379,47 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::dispose() noexcept
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
-inline RBTree<_Key, _Value, _Compare, _Allocate>::iterator RBTree<_Key, _Value, _Compare, _Allocate>::find(const _Key && key) noexcept
+inline auto RBTree<_Key, _Value, _Compare, _Allocate>::find(const _Key & key) noexcept
 {
 	auto p = m_pRoot;
 	while (!isLeaf(p))
 	{
-		if (p->data.key == key)
+		if (key == p->data.key)
 		{
-			return RBTree<_Key, _Value, _Compare, _Allocate>::iterator(p);
+			return iterator(p);
+		}
+		else if (m_Comparator(key, p->data.key))
+		{
+			p = p->left;
+		}
+		else
+		{
+			p = p->right;
 		}
 	}
-	return RBTree<_Key, _Value, _Compare, _Allocate>::iterator();
+	return iterator();
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline auto RBTree<_Key, _Value, _Compare, _Allocate>::find(const _Key && key) noexcept
+{
+	auto p = m_pRoot;
+	while (!isLeaf(p))
+	{
+		if (key == p->data.key)
+		{
+			return iterator(p);
+		}
+		else if (m_Comparator(key, p->data.key))
+		{
+			p = p->left;
+		}
+		else
+		{
+			p = p->right;
+		}
+	}
+	return iterator();
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
