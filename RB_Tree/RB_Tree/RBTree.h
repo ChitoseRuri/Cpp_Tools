@@ -36,6 +36,8 @@ public:
 
 	T * allocate() noexcept;
 	void deallocate(T *& p);
+	size_t size() const noexcept;
+	size_t max_size() const noexcept;
 	void clear() noexcept;
 	void dispose() noexcept;
 };
@@ -73,6 +75,7 @@ public:
 
 	public:
 		iterator();
+		iterator(Node<_Key, _Value> *p);
 		~iterator();
 
 		void operator++();
@@ -94,8 +97,8 @@ private:
 	Node<_Key, _Value> * m_pRoot;
 
 private:
-	void rotateLeft() noexcept;
-	void rotateRight() noexcept;
+	void rotateLeft(Node<_Key,_Value> * const p) noexcept;//counter clockwise
+	void rotateRight(Node<_Key, _Value> * const p) noexcept;//clockwise
 	void clone(Node<_Key, _Value> *const pDestination, Node<_Key, _Value> *const pSource) noexcept;
 	void fix();
 
@@ -107,7 +110,11 @@ public:
 	void clone(const RBTree & lhs) noexcept;
 	void clear() noexcept;
 	void dispose() noexcept;
+	RBTree<_Key, _Value, _Compare, _Allocate>::iterator find(const _Key && key) noexcept;
 	bool isLeaf(const Node<_Key, _Value> *const p)const noexcept;
+	bool insert(Pair<_Key, _Value> & lhs) noexcept;
+	bool insert(Pair<_Key, _Value>&& rhs) noexcept;
+
 };
 
 template<typename T>
@@ -161,6 +168,18 @@ inline void LazyDelete<T>::deallocate(T *& p)
 }
 
 template<typename T>
+inline size_t LazyDelete<T>::size() const noexcept
+{
+	return m_Data.size();
+}
+
+template<typename T>
+inline size_t LazyDelete<T>::max_size() const noexcept
+{
+	return m_Data.size() + m_Rub.size();
+}
+
+template<typename T>
 inline void LazyDelete<T>::clear() noexcept
 {
 	auto sizeD = m_Data.size();
@@ -188,6 +207,12 @@ inline void LazyDelete<T>::dispose() noexcept
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline RBTree<_Key, _Value, _Compare, _Allocate>::iterator::iterator() :
 	m_p(nullptr)
+{
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline RBTree<_Key, _Value, _Compare, _Allocate>::iterator::iterator(Node<_Key, _Value>* p) :
+	m_p(p)
 {
 }
 
@@ -257,6 +282,38 @@ inline bool RBTree<_Key, _Value, _Compare, _Allocate>::iterator::operator>(const
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateLeft(Node<_Key, _Value>* const p) noexcept
+{
+	auto parent = p->parent;
+	auto rightChild = p->right;
+	if (parent)//if p's parent is not nullptr
+	{
+		(p == parent->left) ? (parent->left = rightChild) : (parent->right = rightChild);
+	}
+	rightChild->parent = parent;
+	p->right = rightChild->left;
+	p->right->parent = p;
+	rightChild->left = p;
+	p->parent = rightChild;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateRight(Node<_Key, _Value>* const p) noexcept
+{
+	auto parent = p->parent;
+	auto leftChild = p->left;
+	if (parent)//if p's parent is not nullptr
+	{
+		(p == parent->left) ? (parent->left = leftChild) : (parent->right = leftChild);
+	}
+	leftChild->parent = parent;
+	p->left = leftChild->right;
+	p->left->parent = p;
+	leftChild->right = p;
+	p->parent = leftChild;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline void RBTree<_Key, _Value, _Compare, _Allocate>::clone(Node<_Key, _Value>* const pDestination, Node<_Key, _Value>* const pSource) noexcept
 {
 	assert(pDestination && pSource);//both ptrs will not be nullptr
@@ -320,7 +377,27 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::dispose() noexcept
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline RBTree<_Key, _Value, _Compare, _Allocate>::iterator RBTree<_Key, _Value, _Compare, _Allocate>::find(const _Key && key) noexcept
+{
+	auto p = m_pRoot;
+	while (!isLeaf(p))
+	{
+		if (p->data.key == key)
+		{
+			return RBTree<_Key, _Value, _Compare, _Allocate>::iterator(p);
+		}
+	}
+	return RBTree<_Key, _Value, _Compare, _Allocate>::iterator();
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline bool RBTree<_Key, _Value, _Compare, _Allocate>::isLeaf(const Node<_Key, _Value>* const p) const noexcept
 {
 	return !(p->left || p->right);
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::insert(Pair<_Key, _Value>& lhs) noexcept
+{
+	return false;
 }
