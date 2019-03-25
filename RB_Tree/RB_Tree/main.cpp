@@ -10,7 +10,7 @@ int main()
 	rbt.insert({ 1,1 });
 	rbt.insert({ 4,4 });
 	rbt.insert({ 9,9 });
-	auto itr = rbt.find(2);
+	auto itr = rbt.find(9);
 	cout << itr->value;
 	_getch();
 	return 0;

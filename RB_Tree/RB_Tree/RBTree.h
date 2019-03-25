@@ -95,15 +95,18 @@ public:
 private:
 	_Allocate m_Allocator;
 	_Compare m_Comparator;
-	Node<_Key, _Value> * m_pRoot;
+	Node<_Key, _Value> * m_pRoot, *m_pMark;
 
 private:
 	void rotateLeft(Node<_Key,_Value> * const p) noexcept;//counter clockwise
 	void rotateRight(Node<_Key, _Value> * const p) noexcept;//clockwise
 	void clone(Node<_Key, _Value> *const pDestination, Node<_Key, _Value> *const pSource) noexcept;
+	bool erase(Node<_Key, _Value> *& p) noexcept;
+	void setParents(Node<_Key, _Value> *& p);
 	auto & find_try(const _Key & key) noexcept;
 	auto & find_try(const _Key && key) noexcept;
-	void fix(Node<_Key, _Value> * p);
+	void fixAfterInsert(Node<_Key, _Value> *& p) noexcept;
+	void fixAfterErase(Node<_Key, _Value> *& p) noexcept;
 
 public:
 	RBTree();
@@ -113,10 +116,12 @@ public:
 	void clone(const RBTree & lhs) noexcept;
 	void clear() noexcept;
 	void dispose() noexcept;
+	bool erase(const _Key & key) noexcept;
+	bool erase(_Key && key) noexcept;
 	auto find(const _Key & key) noexcept;
 	auto find(const _Key && key) noexcept;
 	bool isLeaf(const Node<_Key, _Value> *const p)const noexcept;
-	bool insert(Pair<_Key, _Value> & lhs) noexcept;
+	bool insert(const Pair<_Key, _Value> & lhs) noexcept;
 	bool insert(Pair<_Key, _Value>&& rhs) noexcept;
 };
 
@@ -289,9 +294,20 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateLeft(Node<_Key, _Va
 {
 	auto parent = p->parent;
 	auto rightChild = p->right;
+	if (p == m_pRoot)
+	{
+		m_pRoot = rightChild;
+	}
 	if (parent)//if p's parent is not nullptr
 	{
-		(p == parent->left) ? (parent->left = rightChild) : (parent->right = rightChild);
+		if (p == parent->left)
+		{
+			parent->left = rightChild;
+		}
+		else
+		{
+			parent->right = rightChild;
+		}
 	}
 	rightChild->parent = parent;
 	p->right = rightChild->left;
@@ -305,9 +321,20 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateRight(Node<_Key, _V
 {
 	auto parent = p->parent;
 	auto leftChild = p->left;
+	if (p == m_pRoot)
+	{
+		m_pRoot = leftChild;
+	}
 	if (parent)//if p's parent is not nullptr
 	{
-		(p == parent->left) ? (parent->left = leftChild) : (parent->right = leftChild);
+		if (p == parent->left)
+		{
+			parent->left = leftChild;
+		}
+		else
+		{
+			parent->right = leftChild;
+		}
 	}
 	leftChild->parent = parent;
 	p->left = leftChild->right;
@@ -319,19 +346,68 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateRight(Node<_Key, _V
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline void RBTree<_Key, _Value, _Compare, _Allocate>::clone(Node<_Key, _Value>* const pDestination, Node<_Key, _Value>* const pSource) noexcept
 {
-	assert(pDestination && pSource);//both ptrs will not be nullptr
-	if (isLeaf(pSource))			//return when pSource is leaf node
+	assert(!pDestination);
+	if (!pSource)			//return when pSource is nullptr 
 	{
 		return;
 	}
-	pDestination->data = pSource->data;
+	pDestination = m_Allocator.allocate();
 	pDestination->color = pSource->color;
-	pDestination->left = m_Allocator.allocate();
-	pDestination->left->parent = pDestination;
-	pDestination->right = m_Allocator.allocate();
-	pDestination->right->parent = pDestination;
+	pDestination->data = pSource->data;
 	clone(pDestination->left, pSource->left);
 	return clone(pDestination->right, pSource->right);//tail return
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::erase(Node<_Key, _Value>*& p) noexcept
+{
+	if (p)
+	{
+		if (isLeaf(p))//There aren't children.
+		{
+			m_Allocator.deallocate(p);
+		}
+		else if (p->left && p->right)//There are both children.
+		{
+			auto pf = pf->right;//To find the min from who bigger than key.
+			while (pf->left)
+			{
+				pf = pf->left;
+			}
+			auto & back = pf->parent->left;//The back node.
+			p->data = back->data;		   //Copy back's data to p's data, then erase back.
+			return erase(back);
+		}
+		else//There is one child.
+		{
+			auto child = (p->left) ? (p->left) : (p->right);
+			if (p->parent)
+			{
+				auto & parent = p->parent;
+				(parent->left == p) ? (parent->left = child) : (parent->right = child);
+				child->parent = parent;
+				m_Allocator.deallocate(p);
+			}
+		}
+		fixAfterErase(p);//Only fix before return true.
+		return true;
+	}
+	return false;//If could not find this key, return false.
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::setParents(Node<_Key, _Value>*& p)
+{
+	if (p->left)
+	{
+		p->left->parent = p;
+		setParents(p->left);
+	}
+	if (p->right)
+	{
+		p->right->parent = p;
+		return setParents(p->right);
+	}
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
@@ -346,7 +422,10 @@ inline auto & RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key & k
 	{
 		if (key == p->data.key)
 		{
-			return p;
+			//Change return temp p to heap p.
+			auto & parent = p->parent;
+			m_pMark = parent;
+			return (p == parent->left) ? (parent->left) : (parent->right);
 		}
 		else if (m_Comparator(key, p->data.key))
 		{
@@ -356,6 +435,7 @@ inline auto & RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key & k
 			}
 			else
 			{
+				m_pMark = p;
 				return p->left;
 			}
 		}
@@ -367,6 +447,7 @@ inline auto & RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key & k
 			}
 			else
 			{
+				m_pMark = p;
 				return p->right;
 			}
 		}
@@ -385,7 +466,10 @@ inline auto & RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key && 
 	{
 		if (key == p->data.key)
 		{
-			return p;
+			//Change return temp p to heap p.
+			auto & parent = p->parent;
+			m_pMark = parent;
+			return (p == parent->left) ? (parent->left) : (parent->right);
 		}
 		else if (m_Comparator(key, p->data.key))
 		{
@@ -395,6 +479,7 @@ inline auto & RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key && 
 			}
 			else
 			{
+				m_pMark = p;
 				return p->left;
 			}
 		}
@@ -406,6 +491,7 @@ inline auto & RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key && 
 			}
 			else
 			{
+				m_pMark = p;
 				return p->right;
 			}
 		}
@@ -415,7 +501,7 @@ inline auto & RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key && 
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
-inline void RBTree<_Key, _Value, _Compare, _Allocate>::fix(Node<_Key, _Value>* p)
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::fixAfterInsert(Node<_Key, _Value>*& p) noexcept
 {
 	auto parent = p->parent;
 	if (!parent)
@@ -431,14 +517,14 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::fix(Node<_Key, _Value>* p
 	{
 		auto grap = parent->parent;
 		auto uncle = (parent == grap->left) ? (grap->right) : (grap->left);
-		if (uncle->color == RB_Tree_Color::red)
+		if (uncle && uncle->color == RB_Tree_Color::red)
 		{
 			parent->color = RB_Tree_Color::red;
 			uncle->color = RB_Tree_Color::black;
 			grap->color = RB_Tree_Color::red;
-			return fix(grap);
+			return fixAfterInsert(grap);
 		}
-		if (uncle->color == RB_Tree_Color::black)
+		else //If uncle is not exists, treat it as it is black.
 		{
 			if (p == parent->left)
 			{
@@ -456,13 +542,15 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::fix(Node<_Key, _Value>* p
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree():
-	m_pRoot(nullptr)
+	m_pRoot(nullptr),
+	m_pMark(nullptr)
 {	
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(const RBTree & lhs):
-	m_pRoot(m_Allocator.allocate())//Initial root before clone
+	m_pRoot(nullptr), 
+	m_pMark(nullptr)
 {
 	clone(lhs);
 }
@@ -470,6 +558,7 @@ inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(const RBTree & lhs):
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(RBTree && rhs) :
 	m_pRoot(rhs.m_pRoot),
+	m_pMark(nullptr),
 	m_Allocator(std::move(rhs.m_Allocator))
 {
 	rhs.m_pRoot = nullptr;
@@ -478,11 +567,12 @@ inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(RBTree && rhs) :
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline void RBTree<_Key, _Value, _Compare, _Allocate>::clone(const RBTree & lhs) noexcept
 {
-	if (!isLeaf(m_pRoot))
+	if (!m_pRoot)
 	{
 		clear();
 	}
 	clone(m_pRoot, lhs.m_pRoot);
+	return setParents(m_pRoot);
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
@@ -500,46 +590,53 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::dispose() noexcept
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::erase(const _Key & key) noexcept
+{
+	auto p = find_try(key);
+	return erase(p);
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::erase(_Key && key) noexcept
+{
+	auto p = find_try(key);
+	return erase(p);
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline auto RBTree<_Key, _Value, _Compare, _Allocate>::find(const _Key & key) noexcept
 {
 	auto p = find_try(key);
-	return iterator(isLeaf(p) ? nullptr : p);
+	return iterator(p);
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline auto RBTree<_Key, _Value, _Compare, _Allocate>::find(const _Key && key) noexcept
 {
 	auto p = find_try(key);
-	return iterator(isLeaf(p) ? nullptr : p);
+	return iterator(p);
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline bool RBTree<_Key, _Value, _Compare, _Allocate>::isLeaf(const Node<_Key, _Value>* const p) const noexcept
 {
-	return !p;
+	return !(p->left || p->right);
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
-inline bool RBTree<_Key, _Value, _Compare, _Allocate>::insert(Pair<_Key, _Value>& lhs) noexcept
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::insert(const Pair<_Key, _Value>& lhs) noexcept
 {
 	auto & p = find_try(lhs.key);
-	if (!isLeaf(p))	// That means this key exists.
+	if (p)	// That means this key exists.
 	{
 		return false;
 	}
-	// If p is leaf node, it is the node we want to insert.
+	// If p is nullptr, it is the node we want to insert.
 	p = m_Allocator.allocate();
 	p->data = lhs;
 	p->color = RB_Tree_Color::red;
-	if (p->left)
-	{
-		p->left->parent = p;
-	}
-	if (p->right)
-	{
-		p->right->parent = p;
-	}
-	fix(p);
+	p->parent = m_pMark;
+	fixAfterInsert(p);
 	return true;
 }
 
@@ -547,21 +644,14 @@ template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline bool RBTree<_Key, _Value, _Compare, _Allocate>::insert(Pair<_Key, _Value>&& rhs) noexcept
 {
 	auto & p = find_try(rhs.key);
-	if (!isLeaf(p))	// That means this key exists.
+	if (p)	// That means this key exists.
 	{
 		return false;
 	}
 	p = m_Allocator.allocate();
 	p->data = std::move(rhs);
 	p->color = RB_Tree_Color::red;
-	if (p->left)
-	{
-		p->left->parent = p;
-	}
-	if (p->right)
-	{
-		p->right->parent = p;
-	}
-	fix(p);
+	p->parent = m_pMark;
+	fixAfterInsert(p);
 	return true;
 }
