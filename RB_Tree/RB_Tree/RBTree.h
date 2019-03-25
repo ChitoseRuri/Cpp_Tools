@@ -15,9 +15,13 @@ enum class RB_Tree_Color
 template<typename T>
 struct Smaller
 {
-	bool operator()(T && lhs, T && rhs)
+	bool operator() (T & lhsl, T & lhsr)
 	{
-		return lhs < rhs;
+		return lhsl < lhsr;
+	}
+	bool operator()(T && rhsl, T && rhsr)
+	{
+		return rhsl < rhsr;
 	}
 };
 
@@ -101,7 +105,9 @@ private:
 	void rotateLeft(Node<_Key,_Value> * const p) noexcept;//counter clockwise
 	void rotateRight(Node<_Key, _Value> * const p) noexcept;//clockwise
 	void clone(Node<_Key, _Value> *const pDestination, Node<_Key, _Value> *const pSource) noexcept;
-	void fix();
+	auto find_try(const _Key & key) noexcept;
+	auto find_try(const _Key && key) noexcept;
+	void fix(Node<_Key, _Value> * p);
 
 public:
 	RBTree();
@@ -334,6 +340,69 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::clone(Node<_Key, _Value>*
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline auto RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key & key) noexcept
+{
+	auto p = m_pRoot;
+	while (!isLeaf(p))
+	{
+		if (key == p->data.key)
+		{
+			p;
+		}
+		else if (m_Comparator(key, p->data.key))
+		{
+			p = p->left;
+		}
+		else
+		{
+			p = p->right;
+		}
+	}
+	return p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline auto RBTree<_Key, _Value, _Compare, _Allocate>::find_try(const _Key && key) noexcept
+{
+	auto p = m_pRoot;
+	while (!isLeaf(p))
+	{
+		if (key == p->data.key)
+		{
+			p;
+		}
+		else if (m_Comparator(key, p->data.key))
+		{
+			p = p->left;
+		}
+		else
+		{
+			p = p->right;
+		}
+	}
+	return p;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::fix(Node<_Key, _Value>* p)
+{
+	auto parent = p->parent;
+	if (!parent)
+	{
+		p->color = RB_Tree_Color::black;
+		return;
+	}
+	if (parent->color == RB_Tree_Color::black)
+	{
+		return;
+	}
+	else//If parent's color is red, it must has parent.
+	{
+		auto uncle = parent
+	}
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree():
 	m_pRoot(m_Allocator.allocate())
 {	
@@ -341,7 +410,7 @@ inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree():
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline RBTree<_Key, _Value, _Compare, _Allocate>::RBTree(const RBTree & lhs):
-	m_pRoot(m_Allocator.allocate())//initial root before clone
+	m_pRoot(m_Allocator.allocate())//Initial root before clone
 {
 	clone(lhs);
 }
@@ -381,45 +450,15 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::dispose() noexcept
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline auto RBTree<_Key, _Value, _Compare, _Allocate>::find(const _Key & key) noexcept
 {
-	auto p = m_pRoot;
-	while (!isLeaf(p))
-	{
-		if (key == p->data.key)
-		{
-			return iterator(p);
-		}
-		else if (m_Comparator(key, p->data.key))
-		{
-			p = p->left;
-		}
-		else
-		{
-			p = p->right;
-		}
-	}
-	return iterator();
+	auto p = find_try(key);
+	return iterator(isLeaf(p) ? nullptr : p);
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline auto RBTree<_Key, _Value, _Compare, _Allocate>::find(const _Key && key) noexcept
 {
-	auto p = m_pRoot;
-	while (!isLeaf(p))
-	{
-		if (key == p->data.key)
-		{
-			return iterator(p);
-		}
-		else if (m_Comparator(key, p->data.key))
-		{
-			p = p->left;
-		}
-		else
-		{
-			p = p->right;
-		}
-	}
-	return iterator();
+	auto p = find_try(key);
+	return iterator(isLeaf(p) ? nullptr : p);
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
@@ -431,5 +470,36 @@ inline bool RBTree<_Key, _Value, _Compare, _Allocate>::isLeaf(const Node<_Key, _
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
 inline bool RBTree<_Key, _Value, _Compare, _Allocate>::insert(Pair<_Key, _Value>& lhs) noexcept
 {
-	return false;
+	auto p = find_try(lhs.key);
+	if (!isLeaf(p))	// That means this key exists.
+	{
+		return false;
+	}
+	// If p is leaf node, it is the node we want to insert.
+	p->data = lhs;
+	p->color = RB_Tree_Color::red;
+	p->left = m_Allocator.allocate();
+	p->right = m_Allocator.allocate();
+	p->left->parent = p;
+	p->right->parent = p;
+	fix(p);
+	return true;
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline bool RBTree<_Key, _Value, _Compare, _Allocate>::insert(Pair<_Key, _Value>&& rhs) noexcept
+{
+	auto p = find_try(rhs.key);
+	if (!isLeaf(p))	// That means this key exists.
+	{
+		return false;
+	}
+	p->data = std::move(rhs);
+	p->color = RB_Tree_Color::red;
+	p->left = m_Allocator.allocate();
+	p->right = m_Allocator.allocate();
+	p->left->parent = p;
+	p->right->parent = p;
+	fix(p);
+	return true;
 }
