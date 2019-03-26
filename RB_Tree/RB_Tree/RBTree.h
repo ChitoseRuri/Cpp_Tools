@@ -298,7 +298,7 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateLeft(Node<_Key, _Va
 	{
 		m_pRoot = rightChild;
 	}
-	if (parent)//if p's parent is not nullptr
+	else//p isn't m_pRoot, parent must not nullptr
 	{
 		if (p == parent->left)
 		{
@@ -311,7 +311,10 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateLeft(Node<_Key, _Va
 	}
 	rightChild->parent = parent;
 	p->right = rightChild->left;
-	p->right->parent = p;
+	if (p->right)
+	{
+		p->right->parent = p;
+	}
 	rightChild->left = p;
 	p->parent = rightChild;
 }
@@ -325,7 +328,7 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateRight(Node<_Key, _V
 	{
 		m_pRoot = leftChild;
 	}
-	if (parent)//if p's parent is not nullptr
+	else//p isn't m_pRoot, parent must not nullptr
 	{
 		if (p == parent->left)
 		{
@@ -338,7 +341,10 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::rotateRight(Node<_Key, _V
 	}
 	leftChild->parent = parent;
 	p->left = leftChild->right;
-	p->left->parent = p;
+	if (p->left)
+	{
+		p->left->parent = p;
+	}
 	leftChild->right = p;
 	p->parent = leftChild;
 }
@@ -526,11 +532,11 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::fixAfterInsert(Node<_Key,
 		}
 		else //If uncle is not exists, treat it as it is black.
 		{
-			if (p == parent->left)
+			if (p == parent->right)
 			{
 				return rotateLeft(parent);
 			}
-			else// p == parent->right
+			else// p == parent->left
 			{
 				parent->color = RB_Tree_Color::black;
 				grap->color = RB_Tree_Color::red;
@@ -538,6 +544,11 @@ inline void RBTree<_Key, _Value, _Compare, _Allocate>::fixAfterInsert(Node<_Key,
 			}
 		}
 	}
+}
+
+template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
+inline void RBTree<_Key, _Value, _Compare, _Allocate>::fixAfterErase(Node<_Key, _Value>*& p) noexcept
+{
 }
 
 template<typename _Key, typename _Value, typename _Compare, typename _Allocate>
