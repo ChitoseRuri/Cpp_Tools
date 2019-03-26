@@ -390,7 +390,14 @@ inline bool RBTree<_Key, _Value, _Compare, _Allocate>::erase(Node<_Key, _Value>*
 			if (p->parent)
 			{
 				auto & parent = p->parent;
-				(parent->left == p) ? (parent->left = child) : (parent->right = child);
+				if (parent->left == p)
+				{
+					parent->left = child;
+				} 
+				else
+				{
+					parent->right = child;
+				}
 				child->parent = parent;
 				m_Allocator.deallocate(p);
 			}
