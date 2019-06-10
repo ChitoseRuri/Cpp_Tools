@@ -1,0 +1,24 @@
+// *********************
+// for循环语句测试
+//
+
+int a := 3, b := 5, i;
+
+begin
+
+	//
+	// for+语句块
+	//
+	for i := 0 step 1 until i > 100 do
+	begin
+		a += i;
+		b -= i;
+		write(a * b, i);
+	end;
+	
+	//
+	// for+语句
+	//
+	for i := 0 step 1 until i > 5 do
+		write(i);
+end.

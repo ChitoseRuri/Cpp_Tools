@@ -18,6 +18,22 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Pl0.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Pl0_Analyze.cpp" />
+    <ClCompile Include="Pl0_Error.cpp" />
+    <ClCompile Include="Pl0_Gramma.cpp" />
+    <ClCompile Include="Pl0_Lexical.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Pl0.h" />
+    <ClInclude Include="Pl0_Analyze.h" />
+    <ClInclude Include="Pl0_Error.h" />
+    <ClInclude Include="Pl0_Gramma.h" />
+    <ClInclude Include="Pl0_Lexical.h" />
+    <ClInclude Include="Pl0_Protocol.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{ECE417B9-BEE0-4B5F-A5A8-EBCD4B7EE354}</ProjectGuid>
@@ -122,13 +138,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\FDictionary\Study\编译原理实验\PL0源程序（C语言）\PL0.h" />
-    <ClInclude Include="..\..\..\..\FDictionary\Study\编译原理实验\PL0源程序（C语言）\set.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\..\FDictionary\Study\编译原理实验\PL0源程序（C语言）\pl0.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

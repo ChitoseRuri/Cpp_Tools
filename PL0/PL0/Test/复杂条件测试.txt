@@ -1,0 +1,19 @@
+//
+// 复杂条件测试
+//
+int a, b;
+
+begin
+	a := 3;
+	b := 5;
+	if a > b && a > 5 then return;
+	if a < b || a > 5 then return;
+	if a <= b || a > 3 && b <= 4 then return;
+	if a != b && b != a || a = b && b = a then return;
+	if a + 3 > b && (a - 3 < b || b >= 0) then return;
+	if !(a > b) then return;
+	if !(a > b && b > 0) then return;
+	if !(a < b) || !(a = 3) then return;
+	if !(!(!(!(!(-a + b > 0))))) then return;
+	if (a = b || a - (-b) > 3) && (b >= 4 || a <= 5) then return;
+end.

@@ -1,0 +1,28 @@
+// *********************
+// while循环语句测试
+//
+
+int i, sum := 0, sum2 := 0;
+
+begin
+
+	//
+	// while+语句块
+	//
+	i := 100;
+	while (i > 0) do
+	begin
+		sum += i;
+		i -= 1;
+	end;
+	write(sum);
+	
+	//
+	// while+语句
+	//
+	read(i);
+	while (i < 100 && i != 0) do
+		i *= i;
+	write(i);
+
+end.

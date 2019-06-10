@@ -15,16 +15,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\FDictionary\Study\编译原理实验\PL0源程序（C语言）\PL0.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\FDictionary\Study\编译原理实验\PL0源程序（C语言）\set.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\..\FDictionary\Study\编译原理实验\PL0源程序（C语言）\pl0.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Pl0.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Pl0_Lexical.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Pl0_Gramma.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Pl0_Analyze.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Pl0_Error.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Pl0.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Pl0_Lexical.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Pl0_Gramma.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Pl0_Analyze.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Pl0_Error.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Pl0_Protocol.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
