@@ -4,6 +4,8 @@
 enum class Sym
 {
 	Error_Word,
+	IF,
+	THEN,
 	BEGIN,
 	END,
 	ELSE,
@@ -37,5 +39,18 @@ struct Amount
 	int NUM;
 };
 
-const char* const keepWord[]{ "begin", "end", "else", "for", "step", "until", "do", "return" ,
-							"//","=","+","-","*","/","+=","-=","*=","/=" };
+const char* const keepWord[]{ "if", "then", "begin", "end", "else", "for", "step", "until", "do", "return" ,
+"//",":=", "+","-","*","/","+=","-=","*=","/=" };
+
+const char const throwChar[]{ ' ','	' };
+
+const char const coChar[]{ ':','/' };
+
+enum class CharType
+{
+	Name,
+	CCC,// 可连续字符
+	NCC,// 不可连续字符
+	Space,
+	Error
+};

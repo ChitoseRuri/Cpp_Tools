@@ -14,15 +14,18 @@ private:
 	std::string m_Buffer;				// »º³åÇø
 	std::unordered_map<std::string, Sym> m_SymSearch;
 
+private:
+	bool isSpace(char ch);
+	CharType checkChar(char ch);
+
 public:
 	Pl0_Lexical();
 	~Pl0_Lexical();
 
 	void openFile(std::string path);
 	void closeFile();
-	const Amount & getWord();
+	const Amount& getWord();
+	void jumpLine();
 
-private:
-	
 };
 
