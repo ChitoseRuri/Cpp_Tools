@@ -1,24 +1,10 @@
-// *********************
-// for循环语句测试
-//
-
-int a := 3, b := 5, i;
-
+﻿int i, sum := 0, times;
+// 计算1+2+3+...+times
 begin
-
-	//
-	// for+语句块
-	//
-	for i := 0 step 1 until i > 100 do
-	begin
-		a += i;
-		b -= i;
-		write(a * b, i);
-	end;
-	
-	//
-	// for+语句
-	//
-	for i := 0 step 1 until i > 5 do
-		write(i);
+    read(times);
+    for i := 1 step 1 until i > times do
+    begin
+        sum += i;
+    end;
+    write(sum);
 end.

@@ -28,25 +28,24 @@ CharType Pl0_Lexical::checkChar(char ch)
 	{
 		return CharType::Name;
 	}
-	for (auto& var : coChar)
-	{
-		if (ch == var)
-		{
-			return CharType::CCC;
-		}
-	}
-	return CharType::NCC;
+	return CharType::CC;
 }
 
 Pl0_Lexical::Pl0_Lexical()
 {
+	static_assert(sizeof(escapeKey) == sizeof(escapeValue), "Difference size between escapeKey and escapeValue.");
+	static_assert(sizeof(keepWord) / sizeof(char*) == (static_cast<int>(Sym::Eof) - 3), "Difference size between keepword and enum");
 	int i = 0;
 	for (auto str : keepWord)
 	{
 		m_SymSearch.insert(std::make_pair(str, static_cast<Sym>(++i)));
 	}
+	i = 0;
+	for (auto ch : escapeKey)
+	{
+		m_EscapeString.insert(std::make_pair(ch, escapeValue[i++]));
+	}
 }
-
 
 Pl0_Lexical::~Pl0_Lexical()
 {
@@ -88,12 +87,26 @@ const Amount& Pl0_Lexical::getWord()
 		}
 		m_FileReader >> ch;
 	}
-	// 判断字符是否为数字
-	if (ch >= '0' && ch <= '9')
+	if (ch >= '0' && ch <= '9')// 判断字符是否为数字
 	{
 		m_FileReader.seekg(-1, std::ios::cur);
 		m_FileReader >> m_Amount.NUM;
 		m_Amount.SYM = Sym::Number;
+	}
+	else if(ch == '\\')// 判断是不是转义字符
+	{
+		char nch;
+		m_FileReader >> nch;
+		char ech = m_EscapeString[nch];
+		m_Amount.SYM = Sym::Number;
+		if (nch && !ech)// 转义字符表里面搜索成功
+		{
+			m_Amount.NUM = ech;
+		}
+		else
+		{ 
+			m_Amount.NUM = nch;
+		}
 	}
 	else // 判断保留字 
 	{
@@ -109,7 +122,7 @@ const Amount& Pl0_Lexical::getWord()
 					m_FileReader.seekg(-1, std::ios::cur);
 				}
 				m_Amount.SYM = m_SymSearch[m_Buffer];
-				std::cout << m_Buffer;
+				//std::cout << m_Buffer;
 				break;
 			}
 			m_FileReader >> ch;

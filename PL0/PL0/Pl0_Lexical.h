@@ -13,6 +13,7 @@ private:
 	Amount m_Amount;					// 3个全程量
 	std::string m_Buffer;				// 缓冲区
 	std::unordered_map<std::string, Sym> m_SymSearch;
+	std::unordered_map<char, char> m_EscapeString;
 
 private:
 	bool isSpace(char ch);

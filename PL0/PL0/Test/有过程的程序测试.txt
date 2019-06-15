@@ -1,6 +1,6 @@
 int a, b, c;
 
-procedure output(int a, float b);
+procedure output(int a, int b);
 write(a, b);
 
 

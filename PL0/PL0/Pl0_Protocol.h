@@ -4,6 +4,7 @@
 enum class Sym
 {
 	Error_Word,
+
 	IF,
 	THEN,
 	BEGIN,
@@ -14,6 +15,9 @@ enum class Sym
 	UNTIL,
 	DO,
 	RETURN,
+	INT,
+	CHAR,
+
 	COMMENT,
 	EQUAL,
 	ADD,
@@ -39,18 +43,25 @@ struct Amount
 	int NUM;
 };
 
-const char* const keepWord[]{ "if", "then", "begin", "end", "else", "for", "step", "until", "do", "return" ,
+const char* const keepWord[]{ "if", "then", "begin", "end", "else", "for", "step", "until", "do", "return" , "int ", "char", 
 "//",":=", "+","-","*","/","+=","-=","*=","/=" };
 
-const char const throwChar[]{ ' ','	' };
+const char throwChar[]{ ' ','	' };
 
-const char const coChar[]{ ':','/' };
+const char escapeKey[]{ 'a','b','f','n','r','t','v','\\','\'','\"','\?','\0' };
+const char escapeValue[]{ 7,8,12,10,13,9,11,92,39,34,63,0 };
 
 enum class CharType
 {
 	Name,
-	CCC,// 可连续字符
-	NCC,// 不可连续字符
+	CC,
+	ES,
 	Space,
+	Error
+};
+
+enum class GrammaError
+{
+	Succeed,
 	Error
 };
